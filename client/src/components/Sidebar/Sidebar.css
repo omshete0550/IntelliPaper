@@ -254,6 +254,7 @@
   background: #1d1b31;
   color: #fff;
   transition: all ease-in-out 0.3s;
+  z-index: 9;
 }
 #header.open {
   padding: 0 36px 0 270px;

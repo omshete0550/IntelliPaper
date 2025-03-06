@@ -1,0 +1,135 @@
+.dashboard_home_container {
+  margin-left: 70px;
+  margin-top: 60px;
+  padding: 20px 20px;
+}
+
+.feed-section {
+  margin-bottom: 30px;
+}
+.feed-section h2 {
+  margin-bottom: 1em;
+}
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  background: #171526;
+  border-radius: 16px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform-style: preserve-3d;
+  transform: perspective(1000px);
+  transition: all 0.3s ease;
+}
+
+/* .card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(131, 58, 180, 0.3),
+    rgba(253, 29, 29, 0.3),
+    rgba(252, 176, 69, 0.3)
+  );
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover {
+  transform: perspective(1000px) translateZ(20px);
+}
+
+.card:hover::before {
+  opacity: 1;
+} */
+
+.badge {
+  display: inline-block;
+  padding: 0.5em 1em;
+  background: linear-gradient(45deg, #833ab4, #fd1d1d);
+  border-radius: 20px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.8rem;
+  color: white;
+  margin-bottom: 1rem;
+  background: linear-gradient(to right, #fff, #ccc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.description {
+  color: #aaa;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-value {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.stat-label {
+  color: #666;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+.read-more {
+  display: block;
+  margin-top: 2em;
+  color: #ffa500;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.read-more:hover {
+  text-decoration: underline;
+}
+.follow-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.follow-btn:hover {
+  background: #0056b3;
+}

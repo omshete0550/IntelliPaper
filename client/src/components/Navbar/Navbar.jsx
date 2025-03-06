@@ -42,7 +42,7 @@ const Navbar = () => {
             <Link to="/">Home</Link>
           </li>
           <li>
-            <Link to="/about">About</Link>
+            <Link to="/dashboard">About</Link>
           </li>
           <li>
             <span onClick={toggleDrawer}>Login</span>

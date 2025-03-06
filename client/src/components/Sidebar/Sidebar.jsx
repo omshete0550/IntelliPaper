@@ -3,14 +3,10 @@ import "./Sidebar.css";
 import { Link } from "react-router-dom";
 import {
   FaBars,
-  FaChartPie,
   FaCheckDouble,
-  FaCog,
-  FaFolder,
   FaHeart,
   FaHome,
   FaNewspaper,
-  FaSearch,
   FaSignOutAlt,
   FaUser,
 } from "react-icons/fa";
@@ -44,7 +40,7 @@ const Sidebar = () => {
           <span className="tooltip">Search</span>
         </li> */}
           <li>
-            <Link to="#">
+            <Link  to="/dashboard/home">
               <i>
                 {" "}
                 <FaHome />
@@ -54,7 +50,7 @@ const Sidebar = () => {
             <span className="tooltip">Home</span>
           </li>
           <li>
-            <Link to="#">
+            <Link to="/dashboard/search-paper">
               <i>
                 {" "}
                 <FaNewspaper />
@@ -95,15 +91,6 @@ const Sidebar = () => {
           <li>
             <Link to="#">
               <i>
-                <FaFolder />
-              </i>
-              <span className="links_name">File Manager</span>
-            </Link>
-            <span className="tooltip">Files</span>
-          </li>
-          <li>
-            <Link to="#">
-              <i>
                 <FaHeart />
               </i>
               <span className="links_name">Saved</span>
@@ -111,14 +98,14 @@ const Sidebar = () => {
             <span className="tooltip">Saved</span>
           </li>
           <li>
-            <Link to="#">
+            <Link to="/dashboard/profile">
               <i>
                 {" "}
-                <FaCog />
+                <FaUser />
               </i>
-              <span className="links_name">Setting</span>
+              <span className="links_name">Profile</span>
             </Link>
-            <span className="tooltip">Setting</span>
+            <span className="tooltip">Profile</span>
           </li>
           <li className="profile">
             <div className="profile-details">
