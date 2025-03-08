@@ -6,6 +6,7 @@ import DashboardHome from "./pages/Dashboard/Sections/DashboardHome/DashboardHom
 import UserPreferencesForm from "./pages/Dashboard/Sections/UserPreferencesForm/UserPreferencesForm";
 import Profile from "./pages/Dashboard/Sections/Profile/Profile";
 import SearchPaper from "./pages/Dashboard/Sections/SearchPaper/SearchPaper";
+import PlagiarismChecker from "./pages/Dashboard/Sections/PlagiarismChecker/PlagiarismChecker";
 
 function App() {
   return (
@@ -15,8 +16,9 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />}>
           <Route index element={<DashboardHome />} />
           <Route path="home" element={<DashboardHome />} />
-          <Route path="search-paper" element={<SearchPaper />} />
           <Route path="user-preference-form" element={<UserPreferencesForm />} />
+          <Route path="search-paper" element={<SearchPaper />} />
+          <Route path="plagiarism-checker" element={<PlagiarismChecker />} />
           <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>

@@ -45,3 +45,9 @@
 .user_pref_form button:hover {
   background-color: #148d7f;
 }
+
+@media (max-width: 1024px) {
+  .user_pref_form_container {
+    margin-left: 50px;
+  }
+}

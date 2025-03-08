@@ -299,6 +299,9 @@
 #header .header .menu {
   max-width: 210px;
   float: right;
+  display: flex;
+  align-items: center;
+  gap: 2em;
 }
 #header .header .menu img {
   width: 36px;
@@ -313,6 +316,57 @@
 #header.shrink .header .menu img {
   width: 27px;
   transition: all ease-in-out 0.3s;
+}
+
+#header .header .menu-item {
+  cursor: pointer;
+  font-size: 20px;
+}
+.header-icon {
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  position: relative;
+}
+
+.header-icon:hover {
+  color: #f0a500;
+}
+.notification-popup {
+  position: absolute;
+  top: 50px;
+  right: 20px;
+  background: #fff;
+  color: #111;
+  width: 250px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 100;
+}
+
+.notification-popup h4 {
+  margin: 0;
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+  font-size: 16px;
+}
+
+.notification-popup ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-popup ul li {
+  padding: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.notification-popup ul li:hover {
+  background: #f0f0f0;
 }
 
 @media (max-width: 600px) {

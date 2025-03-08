@@ -133,3 +133,8 @@
 .follow-btn:hover {
   background: #0056b3;
 }
+@media (max-width: 1024px) {
+  .dashboard_home_container {
+    margin-left: 50px;
+  }
+}

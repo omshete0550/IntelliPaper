@@ -108,3 +108,9 @@
     width: 100%;
   }
 }
+
+@media (max-width: 1024px) {
+  .search_paper_container {
+    margin-left: 50px;
+  }
+}
