@@ -1,0 +1,261 @@
+.profile_container {
+  margin-left: 70px;
+  margin-top: 60px;
+  padding: 20px 20px;
+  display: flex;
+  gap: 2em;
+}
+.profile_left_container {
+  width: 65%;
+}
+.profile_hero_container {
+  height: auto;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  padding: 15px 20px;
+  border-radius: 1em;
+  margin-bottom: 2em;
+}
+.profile_hero {
+  /* height: 25em; */
+  position: relative;
+}
+.profile_hero_img img {
+  width: 100%;
+  height: 30vh;
+  border-radius: 1em;
+}
+.profile_details {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+}
+.profile_card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* background-color: rgba(240, 248, 255, 0.553); */
+  /* position: absolute; */
+  /* top: 50%;
+  left: 5%; */
+  width: 100%;
+  /* height: 8em; */
+  border-radius: 0.5em;
+  margin-top: 2em;
+}
+.profile_card img {
+  width: 4em;
+  object-fit: contain;
+}
+.profile_card i {
+  font-size: 1.5em;
+  color: #1d1b31;
+}
+.profile_details_container {
+  margin-top: 2em;
+}
+.profile_details_container h3 {
+  margin-bottom: 1em;
+}
+
+.profile_right_container {
+  width: 35%;
+}
+.connections_list {
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  padding: 15px 20px;
+  border-radius: 1em;
+}
+.connections_list h2 {
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: #333;
+}
+.connections_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.connections_details {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  margin-bottom: 1.5em;
+}
+.connections_details img {
+  width: 3em;
+}
+.connections_details h3 {
+  font-size: 1em;
+  font-weight: 600;
+}
+.connections_details span {
+  font-size: 0.8em;
+  font-weight: 400;
+}
+.connections_send_btn button {
+  background-color: white;
+  border: none;
+  outline: none;
+  color: #2cbfae;
+  font-weight: 500;
+  font-size: 0.8em;
+  cursor: pointer;
+}
+
+.more-details-card {
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  padding: 15px 20px;
+  border-radius: 1em;
+  margin-top: 2em;
+}
+
+.more-details-card h2 {
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: #333;
+}
+
+.more-details-card .detail-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1.5em;
+  gap: 1em;
+}
+
+.more-details-card .icon {
+  font-size: 1.5em;
+  color: #888;
+  margin-right: 10px;
+}
+
+.more-details-card h4 {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.more-details-card p {
+  margin: 2px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.more-details-card .highlight {
+  color: #d63384;
+  font-weight: 500;
+}
+
+.research-table {
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  padding: 15px 20px;
+  border-radius: 1em;
+  margin: auto;
+  overflow-x: auto;
+}
+
+.research-table h2 {
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: #333;
+}
+
+.research-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.research-table th {
+  text-align: left;
+  font-size: 14px;
+  color: #666;
+  padding-bottom: 10px;
+}
+
+.research-table td {
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.research-table .paper {
+  display: flex;
+  align-items: center;
+}
+
+.research-table .paper img {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.research-table .status {
+  text-transform: capitalize;
+  font-weight: bold;
+}
+
+.research-table .status.ongoing {
+  color: orange;
+}
+
+.research-table .status.completed {
+  color: green;
+}
+
+.research-table .status.rejected {
+  color: red;
+}
+
+.research-table .progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.research-table .percentage {
+  font-size: 12px;
+  color: #333;
+}
+
+.research-table .progress {
+  height: 6px;
+  border-radius: 5px;
+  background-color: gray;
+  transition: width 0.3s ease-in-out;
+}
+
+.research-table .menu {
+  cursor: pointer;
+  color: #888;
+  font-size: 18px;
+  text-align: right;
+}
+
+@media (max-width: 1024px) {
+  .profile_container {
+    display: flex;
+    flex-direction: column;
+    margin-left: 50px;
+  }
+  .profile_left_container,
+  .profile_right_container {
+    width: 100%;
+  }
+  .research-table {
+    padding: 10px;
+    max-width: 100%;
+  }
+
+  .research-table th,
+  .research-table td {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .research-table .paper img {
+    width: 16px;
+    height: 16px;
+  }
+
+  .research-table .progress-bar {
+    gap: 5px;
+  }
+}

@@ -24,7 +24,7 @@ const UserPreferencesForm = ({ onSave }) => {
 
   return (
     <div className="user_pref_form_container">
-      <h2>Preference Inforamtion</h2>
+      <h2>Preference Information</h2>
       <form className="user_pref_form" onSubmit={handleSubmit}>
         <label>Research Interests:</label>
         <input
