@@ -7,6 +7,9 @@ import UserPreferencesForm from "./pages/Dashboard/Sections/UserPreferencesForm/
 import Profile from "./pages/Dashboard/Sections/Profile/Profile";
 import SearchPaper from "./pages/Dashboard/Sections/SearchPaper/SearchPaper";
 import PlagiarismChecker from "./pages/Dashboard/Sections/PlagiarismChecker/PlagiarismChecker";
+import ConferencePage from "./pages/Dashboard/Sections/ConferencePage/ConferencePage";
+import PublishingGuide from "./pages/Dashboard/Sections/PublishingGuide/PublishingGuide";
+
 
 function App() {
   return (
@@ -19,6 +22,8 @@ function App() {
           <Route path="user-preference-form" element={<UserPreferencesForm />} />
           <Route path="search-paper" element={<SearchPaper />} />
           <Route path="plagiarism-checker" element={<PlagiarismChecker />} />
+          <Route path="publishing-guide" element={<PublishingGuide />} />
+          <Route path="conferences" element={<ConferencePage />} />
           <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>

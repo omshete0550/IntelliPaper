@@ -120,7 +120,7 @@
   text-decoration: underline;
 }
 .follow-btn {
-  background: #007bff;
+  background: #2cbfae;
   color: white;
   border: none;
   padding: 8px;
@@ -131,7 +131,7 @@
 }
 
 .follow-btn:hover {
-  background: #0056b3;
+  background: #148d7f;
 }
 @media (max-width: 1024px) {
   .dashboard_home_container {

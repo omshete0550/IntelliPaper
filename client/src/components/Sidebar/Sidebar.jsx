@@ -54,7 +54,14 @@ const Sidebar = () => {
       {/* Sidebar */}
       <div ref={sidebarRef} className={`sidebar ${isOpen ? "open" : ""}`}>
         <div className="logo-details">
-          <FaBars onClick={toggleSidebar} id="btn" className="icons_sidebar" />
+          <i>
+            {" "}
+            <FaBars
+              onClick={toggleSidebar}
+              id="btn"
+              className="icons_sidebar"
+            />
+          </i>
         </div>
         <ul className="nav-list">
           {[
@@ -101,7 +108,10 @@ const Sidebar = () => {
                 <div className="job">Computer Engineering</div>
               </div>
             </div>
-            <FaSignOutAlt id="log_out" />
+            <i id="log_out">
+              {" "}
+              <FaSignOutAlt />
+            </i>
           </li>
         </ul>
       </div>
