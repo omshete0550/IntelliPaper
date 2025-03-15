@@ -1,13 +1,18 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./SearchPaper.css";
 
-const SearchPapers = () => {
+const SearchPapers = ({ savedPapers, setSavedPapers }) => {
   const [query, setQuery] = useState("");
-  const [filters, setFilters] = useState({ category: "", date: "", author: "" });
+  const [filters, setFilters] = useState({
+    category: "",
+    date: "",
+    author: "",
+  });
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // Sample Data
   const samplePapers = [
     {
       title: "AI in Healthcare",
@@ -32,7 +37,6 @@ const SearchPapers = () => {
     },
   ];
 
-  // Handle Search
   const handleSearch = () => {
     setLoading(true);
     setTimeout(() => {
@@ -41,18 +45,24 @@ const SearchPapers = () => {
           paper.title.toLowerCase().includes(query.toLowerCase()) &&
           (filters.category === "" || paper.title.includes(filters.category)) &&
           (filters.date === "" || paper.date.includes(filters.date)) &&
-          (filters.author === "" || paper.author.toLowerCase().includes(filters.author.toLowerCase()))
+          (filters.author === "" ||
+            paper.author.toLowerCase().includes(filters.author.toLowerCase()))
       );
       setResults(filteredResults);
       setLoading(false);
     }, 1000);
   };
 
+  const handleSavePaper = (paper) => {
+    if (!savedPapers.some((saved) => saved.title === paper.title)) {
+      setSavedPapers([...savedPapers, paper]);
+    }
+  };
+
   return (
     <div className="search_paper_container">
       <h1>Search Research Papers</h1>
 
-      {/* Search Bar */}
       <div className="search_bar">
         <input
           type="text"
@@ -63,15 +73,18 @@ const SearchPapers = () => {
         <button onClick={handleSearch}>Search</button>
       </div>
 
-      {/* Filters */}
       <div className="filters">
-        <select onChange={(e) => setFilters({ ...filters, category: e.target.value })}>
+        <select
+          onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+        >
           <option value="">All Categories</option>
           <option value="AI">AI</option>
           <option value="Quantum">Quantum Computing</option>
         </select>
 
-        <select onChange={(e) => setFilters({ ...filters, date: e.target.value })}>
+        <select
+          onChange={(e) => setFilters({ ...filters, date: e.target.value })}
+        >
           <option value="">All Dates</option>
           <option value="2023">2023</option>
           <option value="2022">2022</option>
@@ -84,7 +97,6 @@ const SearchPapers = () => {
         />
       </div>
 
-      {/* Search Results */}
       {loading ? <p>Loading...</p> : null}
 
       <div className="results_container">
@@ -93,11 +105,16 @@ const SearchPapers = () => {
             <div key={index} className="paper_card">
               <h2>{paper.title}</h2>
               <p>{paper.summary}</p>
-              <p><strong>Author:</strong> {paper.author}</p>
-              <p><strong>Date:</strong> {paper.date}</p>
+              <p>
+                <strong>Author:</strong> {paper.author}
+              </p>
+              <p>
+                <strong>Date:</strong> {paper.date}
+              </p>
               <a href={paper.link} target="_blank" rel="noopener noreferrer">
                 Read More
               </a>
+              <button onClick={() => handleSavePaper(paper)} className="savedpaper-btn">Save Paper</button>
             </div>
           ))
         ) : (

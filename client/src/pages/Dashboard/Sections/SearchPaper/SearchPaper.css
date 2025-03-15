@@ -98,7 +98,21 @@
   font-size: 14px;
   transition: 0.3s;
 }
-
+.savedpaper-btn {
+  display: inline-block;
+  margin-top: 10px;
+  margin-left: 10px;
+  padding: 8px 12px;
+  background: #2cbfae;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: 0.3s;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
 .paper_card a:hover {
   background: #148d7f;
 }

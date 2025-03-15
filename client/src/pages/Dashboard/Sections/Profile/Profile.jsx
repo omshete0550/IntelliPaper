@@ -201,8 +201,8 @@ const Profile = () => {
               <div className="detail-item">
                 <FaGlobe className="icon" />
                 <div>
-                  <h4>Languages</h4>
-                  <p className="highlight">English, French</p>
+                  <h4>Research Interest</h4>
+                  <p className="highlight">AI, DL, Robotics</p>
                 </div>
               </div>
 
@@ -210,15 +210,19 @@ const Profile = () => {
                 <FaUniversity className="icon" />
                 <div>
                   <h4>Education</h4>
-                  <p className="highlight">Harvard</p>
+                  <p className="highlight">Mumbai University</p>
                 </div>
               </div>
 
               <div className="detail-item">
                 <FaWrench className="icon" />
                 <div>
-                  <h4>Skills</h4>
-                  <p className="highlight">C, C++, JavaScript, HTML</p>
+                  <h4>LinkedIn / Google Scholar</h4>
+                  <p>
+                    <a className="highlight" href="#">
+                      User
+                    </a>
+                  </p>
                 </div>
               </div>
             </div>

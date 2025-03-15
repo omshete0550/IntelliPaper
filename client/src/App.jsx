@@ -9,6 +9,7 @@ import SearchPaper from "./pages/Dashboard/Sections/SearchPaper/SearchPaper";
 import PlagiarismChecker from "./pages/Dashboard/Sections/PlagiarismChecker/PlagiarismChecker";
 import ConferencePage from "./pages/Dashboard/Sections/ConferencePage/ConferencePage";
 import PublishingGuide from "./pages/Dashboard/Sections/PublishingGuide/PublishingGuide";
+import SavedPaper from "./pages/Dashboard/Sections/SavedPaper/SavedPaper";
 
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
           <Route path="plagiarism-checker" element={<PlagiarismChecker />} />
           <Route path="publishing-guide" element={<PublishingGuide />} />
           <Route path="conferences" element={<ConferencePage />} />
+          <Route path="saved-paper" element={<SavedPaper />} />
           <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>

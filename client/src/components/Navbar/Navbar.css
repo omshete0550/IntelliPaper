@@ -24,6 +24,7 @@
 
 .navbar_container ul {
   list-style: none;
+    z-index: 99;
 }
 
 .navbar_container ul li {

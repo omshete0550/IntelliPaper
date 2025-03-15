@@ -6,9 +6,15 @@ const PlagiarismChecker = () => {
   const [file, setFile] = useState(null);
   const [plagiarismResult, setPlagiarismResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [previousResults, setPreviousResults] = useState([]);
+  const [pdfUrl, setPdfUrl] = useState(null);
 
   const handleFileUpload = (event) => {
-    setFile(event.target.files[0]);
+    const uploadedFile = event.target.files[0];
+    setFile(uploadedFile);
+    if (uploadedFile && uploadedFile.type === "application/pdf") {
+      setPdfUrl(URL.createObjectURL(uploadedFile));
+    }
   };
 
   const getColorClass = (percentage) => {
@@ -20,14 +26,19 @@ const PlagiarismChecker = () => {
   const checkPlagiarism = () => {
     setLoading(true);
     setTimeout(() => {
-      setPlagiarismResult({
-        percentage: 48,
+      const newResult = {
+        id: previousResults.length + 1,
+        name: file ? file.name : "Text Submission",
+        percentage: Math.floor(Math.random() * 100),
         sources: [
           { source: "arxiv.org/1234", match: 25 },
           { source: "researchgate.net/5678", match: 50 },
           { source: "wikipedia.org/AI", match: 75 },
         ],
-      });
+        pdfUrl,
+      };
+      setPlagiarismResult(newResult);
+      setPreviousResults([...previousResults, newResult]);
       setLoading(false);
     }, 2000);
   };
@@ -104,7 +115,44 @@ const PlagiarismChecker = () => {
             ))}
           </div>
 
+          {plagiarismResult.pdfUrl && (
+            <div className="pdf-viewer">
+              <h3>Uploaded Document</h3>
+              <iframe
+                src={plagiarismResult.pdfUrl}
+                className="pdf-frame"
+                title="Uploaded PDF"
+              ></iframe>
+            </div>
+          )}
+
           <button className="download_btn">Download Report</button>
+        </div>
+      )}
+
+      {previousResults.length > 0 && (
+        <div className="previous_results">
+          <h2>Previous Reports</h2>
+          <table className="previous-results-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Document Name</th>
+                <th>Plagiarism (%)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {previousResults.map((result) => (
+                <tr key={result.id}>
+                  <td>{result.id}</td>
+                  <td>{result.name}</td>
+                  <td className={getColorClass(result.percentage)}>
+                    {result.percentage}%
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

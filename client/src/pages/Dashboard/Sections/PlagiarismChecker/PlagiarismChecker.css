@@ -155,12 +155,71 @@
   cursor: pointer;
   border-radius: 5px;
   transition: 0.3s;
-  width: 20%;
+  width: 10em;
   margin-top: 2em;
 }
 .download_btn:hover {
   background-color: #218838;
 }
+.previous_results {
+  margin-top: 2em;
+}
+.previous_results h2 {
+  margin-bottom: 1em;
+  font-size: 24px;
+  color: #333;
+}
+.previous-results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 16px;
+  text-align: left;
+}
+
+.previous-results-table th,
+.previous-results-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
+.previous-results-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.previous-results-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.previous-results-table tr:hover {
+  background-color: #e6f7ff;
+}
+.pdf-viewer {
+  margin-top: 20px;
+}
+
+.pdf-viewer h3 {
+  margin-bottom: 1em;
+  color: #333;
+}
+
+.pdf-frame {
+  width: 100%;
+  height: 500px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.pdf-viewer .highlight {
+  background-color: rgba(255, 0, 0, 0.3);
+  color: black;
+  font-weight: bold;
+  padding: 2px;
+  border-radius: 3px;
+}
+
 @media (max-width: 1024px) {
   .plagiarism_checker_container {
     margin-left: 50px;

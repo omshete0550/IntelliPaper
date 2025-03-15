@@ -87,7 +87,7 @@ const Sidebar = () => {
               label: "Conferences",
             },
             {
-              to: "/dashboard/user-preference-form",
+              to: "/dashboard/saved-paper",
               icon: <FaHeart />,
               label: "Saved",
             },
