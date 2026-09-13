@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ReadingStatus {
+  UNREAD
+  READING
+  FINISHED
+}
+
+model User {
+  id              String       @id @default(cuid())
+  name            String
+  email           String       @unique
+  passwordHash    String
+  interests       String[]     @default([])
+  affiliation     String       @default("")
+  degree          String       @default("")
+  researchStage   String       @default("Idea")
+  linkedin        String       @default("")
+  collaboration   Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  savedPapers     SavedPaper[]
+}
+
+model SavedPaper {
+  id          String        @id @default(cuid())
+  userId      String
+  externalId  String
+  title       String
+  authors     String[]      @default([])
+  venue       String        @default("")
+  year        String        @default("")
+  citations   Int           @default(0)
+  abstract    String        @default("")
+  topics      String[]      @default([])
+  link        String
+  status      ReadingStatus @default(UNREAD)
+  notes       String        @default("")
+  savedAt     DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, externalId])
+  @@index([userId, savedAt])
+}
