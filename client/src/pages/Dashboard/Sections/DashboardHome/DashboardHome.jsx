@@ -1,127 +1,20 @@
-import React from "react";
+import { Link } from "react-router-dom";
+import { FaArrowRight, FaBookOpen, FaCheckCircle, FaCompass, FaSearch } from "react-icons/fa";
 import "./DashboardHome.css";
 
-const DashboardHome = () => {
-  // Sample Data
-  const recommendations = [
-    {
-      title: "AI in Healthcare",
-      summary: "Exploring how AI is revolutionizing the medical field.",
-      link: "https://arxiv.org/abs/2301.12345",
-      badge: "Featured",
-    },
-    {
-      title: "Quantum Computing Breakthrough",
-      summary: "New research in quantum entanglement and computation speed.",
-      link: "https://arxiv.org/abs/2302.67890",
-      badge: "New",
-    },
-    {
-      title: "Neural Networks in NLP",
-      summary:
-        "The evolution of deep learning models for language understanding.",
-      link: "https://arxiv.org/abs/2303.13579",
-      badge: "Popular",
-    },
-  ];
+const recommended = [
+  { title: "Foundation models for clinical reasoning", topic: "Artificial intelligence", note: "A strong match for your research interests." },
+  { title: "Efficient language models at the edge", topic: "Machine learning", note: "Popular with researchers working on practical AI systems." },
+  { title: "Measuring trust in human-AI collaboration", topic: "AI ethics", note: "A useful perspective for responsible AI research." },
+];
 
-  const trendingTopics = [
-    "AI Ethics",
-    "Climate Change Impact",
-    "Blockchain Security",
-    "Autonomous Vehicles",
-    "Genomics & Bioinformatics",
-  ];
-
-  const researchers = [
-    { name: "Dr. John Doe", affiliation: "MIT AI Lab", badge: "Expert" },
-    {
-      name: "Prof. Jane Smith",
-      affiliation: "Stanford NLP Group",
-      badge: "Top Researcher",
-    },
-    {
-      name: "Dr. Robert Brown",
-      affiliation: "Harvard Quantum Research",
-      badge: "Pioneer",
-    },
-  ];
-
-  // Function to truncate title after two words
-  const truncateTitle = (title) => {
-    const words = title.split(" ");
-    return words.length > 2 ? words.slice(0, 2).join(" ") + "..." : title;
-  };
-
-  return (
-    <div className="dashboard_home_container">
-      <section className="feed-section">
-        <h2>Recommended Papers</h2>
-        <div className="card-container">
-          {recommendations.map((paper, index) => (
-            <div key={index} className="card">
-              <span className="badge">{paper.badge}</span>
-              <h2 className="title">{truncateTitle(paper.title)}</h2>
-              <p className="description">{paper.summary}</p>
-              <div className="stats">
-                <div className="stat">
-                  <div className="stat-value">100%</div>
-                  <div className="stat-label">Research Quality</div>
-                </div>
-                <div className="stat">
-                  <div className="stat-value">Trending</div>
-                  <div className="stat-label">Category</div>
-                </div>
-                <div className="stat">
-                  <div className="stat-value">Cited</div>
-                  <div className="stat-label">Impact</div>
-                </div>
-              </div>
-              <a
-                href={paper.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="read-more"
-              >
-                Read More
-              </a>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Trending Research Topics */}
-      <section className="feed-section">
-        <h2>Trending Topics</h2>
-        <div className="card-container">
-          {trendingTopics.map((topic, index) => (
-            <div key={index} className="card">
-              <span className="badge">Hot</span>
-              <h2 className="title">{truncateTitle(topic)}</h2>
-              <p className="description">
-                This topic is currently trending among researchers.
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Suggested Researchers */}
-      <section className="feed-section">
-        <h2>Suggested Researchers</h2>
-        <div className="card-container">
-          {researchers.map((researcher, index) => (
-            <div key={index} className="card">
-              <span className="badge">{researcher.badge}</span>
-              <h2 className="title">{researcher.name}</h2>
-              <p className="description">{researcher.affiliation}</p>
-              <button className="follow-btn">Follow</button>
-            </div>
-          ))}
-        </div>
-      </section>
-    </div>
-  );
-};
+const DashboardHome = ({ savedPapers, preferences }) => (
+  <section className="overview-page">
+    <header className="overview-heading"><div><p className="eyebrow">WELCOME BACK</p><h1>Good to see you, Om.</h1><p>{preferences.interests?.length ? `Your workspace is tuned for ${preferences.interests.slice(0, 2).join(" and ")}.` : "Start by adding your research interests to personalize this workspace."}</p></div><Link to="/dashboard/search-paper" className="primary-action"><FaSearch /> Discover papers</Link></header>
+    <div className="overview-stats"><article><span><FaBookOpen /></span><strong>{savedPapers.length}</strong><p>Saved papers</p></article><article><span><FaCheckCircle /></span><strong>{savedPapers.filter((paper) => paper.status === "Finished").length}</strong><p>Completed reading</p></article><article><span><FaCompass /></span><strong>6</strong><p>Conferences to explore</p></article></div>
+    <div className="overview-grid"><section className="overview-panel recommendations-panel"><div className="panel-heading"><div><h2>Recommended for you</h2><p>Selected from your current interests</p></div><Link to="/dashboard/search-paper">See all <FaArrowRight /></Link></div><div className="recommendation-list">{recommended.map((paper) => <article key={paper.title}><span className="recommendation-dot"></span><div><small>{paper.topic}</small><h3>{paper.title}</h3><p>{paper.note}</p></div><Link to="/dashboard/search-paper" aria-label={`Discover ${paper.title}`}><FaArrowRight /></Link></article>)}</div></section><section className="overview-panel activity-panel"><div className="panel-heading"><div><h2>Your reading queue</h2><p>Continue where you left off</p></div><Link to="/dashboard/saved-paper">Open library <FaArrowRight /></Link></div>{savedPapers.length ? <div className="queue-list">{savedPapers.slice(0, 3).map((paper) => <div key={paper.id}><span className={`queue-status ${paper.status.toLowerCase()}`}></span><span><strong>{paper.title}</strong><small>{paper.status} · {paper.venue}</small></span></div>)}</div> : <div className="queue-empty"><FaBookOpen /><p>Your saved papers will appear here.</p><Link to="/dashboard/search-paper">Find your first paper</Link></div>}</section></div>
+    <section className="overview-next-step"><div><span>YOUR NEXT STEP</span><h2>{preferences.researchStage === "Publishing" ? "Prepare your work for publication" : "Build a focused reading list"}</h2><p>{preferences.researchStage === "Publishing" ? "Use the publishing guide to prepare for journal or conference submission." : "Save a few relevant papers, then use your library to keep your reading deliberate."}</p></div><Link to={preferences.researchStage === "Publishing" ? "/dashboard/publishing-guide" : "/dashboard/search-paper"}>Continue <FaArrowRight /></Link></section>
+  </section>
+);
 
 export default DashboardHome;

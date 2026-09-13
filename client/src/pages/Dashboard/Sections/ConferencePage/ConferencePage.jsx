@@ -210,7 +210,7 @@ const ConferencePage = () => {
                 <td>{conf.date}</td>
                 <td>{conf.location}</td>
                 <td>
-                  <a href={conf.url} target="_blank" rel="noopener noreferrer">
+                  <a href={conf.link} target="_blank" rel="noopener noreferrer">
                     🌍 Visit
                   </a>
                 </td>

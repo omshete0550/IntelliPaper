@@ -5,6 +5,8 @@ import { AiFillCloseCircle } from "react-icons/ai";
 import { MdEmail } from "react-icons/md";
 import { motion, AnimatePresence } from "framer-motion"; // Import animation library
 
+const MotionDiv = motion.div;
+
 const Login = ({ onClose }) => {
   const [isRegister, setIsRegister] = useState(false);
 
@@ -17,7 +19,7 @@ const Login = ({ onClose }) => {
 
       <AnimatePresence mode="wait">
         {isRegister ? (
-          <motion.div
+          <MotionDiv
             key="register"
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -81,9 +83,9 @@ const Login = ({ onClose }) => {
               </span>
               <button>Sign Up</button>
             </div>
-          </motion.div>
+          </MotionDiv>
         ) : (
-          <motion.div
+          <MotionDiv
             key="login"
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -133,7 +135,7 @@ const Login = ({ onClose }) => {
               </span>
               <button>Sign In</button>
             </div>
-          </motion.div>
+          </MotionDiv>
         )}
       </AnimatePresence>
     </div>

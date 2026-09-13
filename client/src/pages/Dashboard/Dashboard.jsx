@@ -1,14 +1,14 @@
-import React from "react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { Outlet } from "react-router-dom";
+import "./Dashboard.css";
 
 const Dashboard = () => {
   return (
-    <div style={{ display: "flex" }}>
+    <div className="dashboard-layout">
       <Sidebar />
-      <div style={{ flex: 1, padding: "20px" }}>
+      <main className="dashboard-main">
         <Outlet />
-      </div>
+      </main>
     </div>
   );
 };
