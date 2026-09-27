@@ -17,5 +17,7 @@
 - `GET /api/papers/search?q=&topic=&year=`
 - `GET` / `POST /api/library`
 - `PATCH` / `DELETE /api/library/:id`
+- `GET` / `POST /api/conferences`
+- `DELETE /api/conferences/:id`
 
-Authenticated endpoints require an `Authorization: Bearer <token>` header. Paper search currently returns development sample data through the paper-search service; replacing that service with an academic-data provider will not change the public API.
+Authenticated endpoints require an `Authorization: Bearer <token>` header. Paper search is powered by the public OpenAlex works index. Set `OPENALEX_EMAIL` in `.env` to identify your application to the provider; it is optional for local development but recommended.

@@ -5,10 +5,12 @@ import Login from "../../pages/Login/Login";
 import Drawer from "react-modern-drawer";
 import "react-modern-drawer/dist/index.css";
 import { FaBookOpen, FaBars, FaTimes } from "react-icons/fa";
+import { useAuth } from "../../context/AuthContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
   const toggleDrawer = () => {
     setIsOpen((prevState) => !prevState);
   };
@@ -30,9 +32,7 @@ const Navbar = () => {
           <li>
             <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>Workspace</Link>
           </li>
-          <li>
-            <button className="nav-login" onClick={toggleDrawer}>Sign in</button>
-          </li>
+          {user ? <li><button type="button" className="nav-login" onClick={logout}>Sign out</button></li> : <li><button type="button" className="nav-login" onClick={toggleDrawer}>Sign in</button></li>}
         </ul>
       </nav>
 

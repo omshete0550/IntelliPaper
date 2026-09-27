@@ -10,3 +10,4 @@ a { color: inherit; }
 ::selection { background: #dce4ff; color: #1d3bb3; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid #93a4ff; outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
+.app-loading { display: grid; min-height: 100vh; place-items: center; color: #53617a; background: #f7f8fc; font-size: 14px; font-weight: 700; }

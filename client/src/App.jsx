@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
+import { useAuth } from "./context/AuthContext";
+import { api, authConfig } from "./lib/api";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import Home from "./pages/Home/Home";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import DashboardHome from "./pages/Dashboard/Sections/DashboardHome/DashboardHome";
@@ -12,49 +15,56 @@ import ConferencePage from "./pages/Dashboard/Sections/ConferencePage/Conference
 import PublishingGuide from "./pages/Dashboard/Sections/PublishingGuide/PublishingGuide";
 import SavedPaper from "./pages/Dashboard/Sections/SavedPaper/SavedPaper";
 
+const statusToClient = { UNREAD: "Unread", READING: "Reading", FINISHED: "Finished" };
+const statusToApi = { Unread: "UNREAD", Reading: "READING", Finished: "FINISHED" };
+const fromApiPaper = (paper) => ({ ...paper, id: paper.externalId, recordId: paper.id, authors: paper.authors.join(", "), status: statusToClient[paper.status] || paper.status });
 
 function App() {
-  const [savedPapers, setSavedPapers] = useState(() => {
-    const saved = localStorage.getItem("intellipaper-library");
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [preferences, setPreferences] = useState(() => {
-    const saved = localStorage.getItem("intellipaper-preferences");
-    return saved ? JSON.parse(saved) : {
-      interests: ["Artificial intelligence", "Machine learning"],
-      affiliation: "Mumbai University",
-      degree: "Computer Engineering",
-      researchStage: "Idea",
-      linkedin: "",
-      collaboration: true,
-    };
-  });
-
+  const { token, user, setUser } = useAuth();
+  const [savedPapers, setSavedPapers] = useState([]);
   useEffect(() => {
-    localStorage.setItem("intellipaper-library", JSON.stringify(savedPapers));
-  }, [savedPapers]);
-  useEffect(() => {
-    localStorage.setItem("intellipaper-preferences", JSON.stringify(preferences));
-  }, [preferences]);
+    if (!token) { setSavedPapers([]); return; }
+    api.get("/library", authConfig(token)).then((response) => setSavedPapers(response.data.papers.map(fromApiPaper))).catch(() => setSavedPapers([]));
+  }, [token]);
 
-  return (
-    <>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard />}>
-          <Route index element={<DashboardHome savedPapers={savedPapers} preferences={preferences} />} />
-          <Route path="home" element={<DashboardHome savedPapers={savedPapers} preferences={preferences} />} />
-          <Route path="user-preference-form" element={<UserPreferencesForm initialPreferences={preferences} onSave={setPreferences} />} />
-          <Route path="search-paper" element={<SearchPaper savedPapers={savedPapers} setSavedPapers={setSavedPapers} />} />
-          <Route path="plagiarism-checker" element={<PlagiarismChecker />} />
-          <Route path="publishing-guide" element={<PublishingGuide />} />
-          <Route path="conferences" element={<ConferencePage />} />
-          <Route path="saved-paper" element={<SavedPaper savedPapers={savedPapers} setSavedPapers={setSavedPapers} />} />
-          <Route path="profile" element={<Profile preferences={preferences} savedPapers={savedPapers} />} />
-        </Route>
-      </Routes>
-    </>
-  );
+  const savePaper = async (paper) => {
+    const payload = { externalId: paper.id, title: paper.title, authors: paper.authors.split(",").map((author) => author.trim()).filter(Boolean), venue: paper.venue, year: paper.year, citations: paper.citations, abstract: paper.abstract, topics: paper.topics, link: paper.link };
+    const response = await api.post("/library", payload, authConfig(token));
+    setSavedPapers((current) => [...current, fromApiPaper(response.data.paper)]);
+  };
+  const removePaper = async (externalId) => {
+    const paper = savedPapers.find((item) => item.id === externalId);
+    if (!paper) return;
+    await api.delete(`/library/${paper.recordId}`, authConfig(token));
+    setSavedPapers((current) => current.filter((item) => item.id !== externalId));
+  };
+  const updatePaper = async (externalId, changes) => {
+    const paper = savedPapers.find((item) => item.id === externalId);
+    if (!paper) return;
+    const payload = { ...changes, ...(changes.status ? { status: statusToApi[changes.status] } : {}) };
+    const response = await api.patch(`/library/${paper.recordId}`, payload, authConfig(token));
+    const updated = fromApiPaper(response.data.paper);
+    setSavedPapers((current) => current.map((item) => item.id === externalId ? updated : item));
+  };
+  const savePreferences = async (preferences) => {
+    const response = await api.put("/profile", preferences, authConfig(token));
+    setUser(response.data.user);
+  };
+
+  return <Routes>
+    <Route path="/" element={<Home />} />
+    <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>}>
+      <Route index element={<DashboardHome savedPapers={savedPapers} preferences={user} />} />
+      <Route path="home" element={<DashboardHome savedPapers={savedPapers} preferences={user} />} />
+      <Route path="user-preference-form" element={<UserPreferencesForm initialPreferences={user} onSave={savePreferences} />} />
+      <Route path="search-paper" element={<SearchPaper savedPapers={savedPapers} onSavePaper={savePaper} onRemovePaper={removePaper} />} />
+      <Route path="plagiarism-checker" element={<PlagiarismChecker />} />
+      <Route path="publishing-guide" element={<PublishingGuide />} />
+      <Route path="conferences" element={<ConferencePage token={token} />} />
+      <Route path="saved-paper" element={<SavedPaper savedPapers={savedPapers} onUpdatePaper={updatePaper} onRemovePaper={removePaper} />} />
+      <Route path="profile" element={<Profile preferences={user} savedPapers={savedPapers} />} />
+    </Route>
+  </Routes>;
 }
 
 export default App;

@@ -1,46 +1,51 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaArrowRight, FaBookmark, FaCheck, FaExternalLinkAlt, FaSearch, FaSlidersH } from "react-icons/fa";
+import { api } from "../../../../lib/api";
 import "./SearchPaper.css";
 
-const papers = [
-  { id: "health-ai", title: "Foundation models for clinical reasoning", authors: "Singhal, K. · Azizi, S. · Tu, T.", venue: "Nature", year: "2025", citations: 284, abstract: "A review of how multimodal foundation models can support careful, evidence-led clinical decisions.", topics: ["Artificial intelligence", "Healthcare"], link: "https://arxiv.org" },
-  { id: "efficient-llm", title: "Efficient language models at the edge", authors: "Kim, J. · Zhao, L. · Raman, P.", venue: "ACM Computing Surveys", year: "2024", citations: 157, abstract: "Methods for reducing inference cost while preserving the quality of language models on constrained devices.", topics: ["Machine learning", "Systems"], link: "https://dl.acm.org" },
-  { id: "trustworthy-ai", title: "Measuring trust in human-AI collaboration", authors: "Gonzalez, M. · Patel, R. · Chen, Y.", venue: "CHI", year: "2024", citations: 91, abstract: "A practical framework for studying calibrated trust when people work alongside intelligent systems.", topics: ["AI ethics", "HCI"], link: "https://dl.acm.org" },
-  { id: "climate-ml", title: "Machine learning for climate adaptation", authors: "Nair, A. · Brown, S. · Okafor, C.", venue: "Science", year: "2023", citations: 426, abstract: "A map of high-value applications of machine learning for climate-risk modelling and adaptation planning.", topics: ["Climate", "Machine learning"], link: "https://www.science.org" },
-  { id: "privacy-preserving", title: "Privacy-preserving federated analytics", authors: "Iyer, R. · Williams, E. · Shah, A.", venue: "IEEE Security & Privacy", year: "2024", citations: 73, abstract: "Design principles for training and analysing distributed data without centralising sensitive records.", topics: ["Privacy", "Systems"], link: "https://ieeexplore.ieee.org" },
-  { id: "robotics-learning", title: "Learning robust policies for assistive robotics", authors: "Park, H. · Silva, D. · Mehta, N.", venue: "ICRA", year: "2025", citations: 48, abstract: "Robust policy learning techniques for robots that operate safely around people in changing environments.", topics: ["Robotics", "Machine learning"], link: "https://ieeexplore.ieee.org" },
-];
+const toClientPaper = (paper) => ({ ...paper, id: paper.externalId, authors: paper.authors.join(", "), topics: paper.topics || [] });
 
-const SearchPaper = ({ savedPapers, setSavedPapers }) => {
+const SearchPaper = ({ savedPapers, onSavePaper, onRemovePaper }) => {
   const [query, setQuery] = useState("");
   const [topic, setTopic] = useState("All topics");
   const [year, setYear] = useState("Any year");
   const [hasSearched, setHasSearched] = useState(false);
+  const [papers, setPapers] = useState([]);
+  const [meta, setMeta] = useState({ page: 1, total: 0, hasMore: false });
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [searchError, setSearchError] = useState("");
+  const [savingId, setSavingId] = useState("");
+  const [actionError, setActionError] = useState("");
 
-  const results = useMemo(() => papers.filter((paper) => {
-    const searchable = `${paper.title} ${paper.authors} ${paper.abstract} ${paper.topics.join(" ")}`.toLowerCase();
-    return searchable.includes(query.toLowerCase()) && (topic === "All topics" || paper.topics.includes(topic)) && (year === "Any year" || paper.year === year);
-  }), [query, topic, year]);
-
-  const toggleSaved = (paper) => {
+  const requestPapers = async (page, append = false) => {
+    const response = await api.get("/papers/search", { params: { q: query, topic: topic === "All topics" ? "" : topic, year: year === "Any year" ? "" : year, page } });
+    const nextPapers = response.data.papers.map(toClientPaper);
+    setPapers((current) => append ? [...current, ...nextPapers] : nextPapers);
+    setMeta({ page: response.data.meta.page, total: response.data.meta.total, hasMore: response.data.meta.page * response.data.meta.perPage < response.data.meta.total });
+  };
+  const search = async () => {
+    setHasSearched(true); setIsLoading(true); setSearchError("");
+    try { await requestPapers(1); } catch { setSearchError("Unable to retrieve papers. Confirm the backend is running and try again."); }
+    finally { setIsLoading(false); }
+  };
+  const loadMore = async () => {
+    setIsLoadingMore(true); setSearchError("");
+    try { await requestPapers(meta.page + 1, true); } catch { setSearchError("Unable to load more papers. Please try again."); }
+    finally { setIsLoadingMore(false); }
+  };
+  useEffect(() => {
+    api.get("/papers/search").then((response) => { const nextPapers = response.data.papers.map(toClientPaper); setPapers(nextPapers); setMeta({ page: response.data.meta.page, total: response.data.meta.total, hasMore: response.data.meta.page * response.data.meta.perPage < response.data.meta.total }); }).catch(() => setSearchError("Unable to retrieve papers. Confirm the backend is running.")).finally(() => setIsLoading(false));
+  }, []);
+  const toggleSaved = async (paper) => {
     const saved = savedPapers.some((savedPaper) => savedPaper.id === paper.id);
-    setSavedPapers(saved ? savedPapers.filter((savedPaper) => savedPaper.id !== paper.id) : [...savedPapers, { ...paper, savedAt: new Date().toISOString(), status: "Unread", notes: "" }]);
+    setSavingId(paper.id); setActionError("");
+    try { if (saved) await onRemovePaper(paper.id); else await onSavePaper(paper); }
+    catch (error) { setActionError(error.response?.data?.error || "Unable to update your library. Confirm the API is running."); }
+    finally { setSavingId(""); }
   };
 
-  return (
-    <section className="discover-page">
-      <header className="page-heading"><div><p className="eyebrow">LITERATURE DISCOVERY</p><h1>Discover papers</h1><p>Explore research that fits your topic, then save the papers worth returning to.</p></div><span className="result-count">{savedPapers.length} saved</span></header>
-      <div className="discover-search-panel">
-        <div className="discover-search"><FaSearch /><input value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => event.key === "Enter" && setHasSearched(true)} placeholder="Search by topic, title, or author" /><button onClick={() => setHasSearched(true)}>Search</button></div>
-        <div className="discover-filters"><span><FaSlidersH /> Refine</span><select value={topic} onChange={(event) => setTopic(event.target.value)}><option>All topics</option><option>Machine learning</option><option>Artificial intelligence</option><option>Healthcare</option><option>AI ethics</option><option>Climate</option><option>Robotics</option><option>Privacy</option></select><select value={year} onChange={(event) => setYear(event.target.value)}><option>Any year</option><option>2025</option><option>2024</option><option>2023</option></select></div>
-      </div>
-      <div className="discover-results-heading"><div><h2>{hasSearched ? "Search results" : "Recommended for you"}</h2><p>{results.length} paper{results.length !== 1 ? "s" : ""} matched your filters</p></div><button className="sort-button">Most relevant <FaArrowRight /></button></div>
-      <div className="paper-results-grid">
-        {results.map((paper) => { const isSaved = savedPapers.some((savedPaper) => savedPaper.id === paper.id); return <article className="research-paper-card" key={paper.id}><div className="paper-card-top"><span>{paper.venue}</span><span>{paper.year}</span></div><h3>{paper.title}</h3><p className="paper-authors">{paper.authors}</p><p className="paper-abstract">{paper.abstract}</p><div className="paper-tags">{paper.topics.map((item) => <span key={item}>{item}</span>)}</div><div className="paper-meta"><span>{paper.citations} citations</span><a href={paper.link} target="_blank" rel="noreferrer">Source <FaExternalLinkAlt /></a></div><button className={`save-paper-button ${isSaved ? "saved" : ""}`} onClick={() => toggleSaved(paper)}>{isSaved ? <><FaCheck /> Saved to library</> : <><FaBookmark /> Save paper</>}</button></article>; })}
-      </div>
-      {results.length === 0 && <div className="no-search-results"><FaSearch /><h2>No papers found</h2><p>Try another topic, author, or publication year.</p></div>}
-    </section>
-  );
+  return <section className="discover-page"><header className="page-heading"><div><p className="eyebrow">LITERATURE DISCOVERY</p><h1>Discover papers</h1><p>Search a live academic index, then save the work worth returning to.</p></div><span className="result-count">{savedPapers.length} saved</span></header><div className="discover-search-panel"><div className="discover-search"><FaSearch /><input value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => event.key === "Enter" && search()} placeholder="Search by topic, title, or author" /><button type="button" onClick={search}>Search</button></div><div className="discover-filters"><span><FaSlidersH /> Refine</span><select value={topic} onChange={(event) => setTopic(event.target.value)}><option>All topics</option><option>Machine learning</option><option>Artificial intelligence</option><option>Healthcare</option><option>AI ethics</option><option>Climate</option><option>Robotics</option><option>Privacy</option></select><select value={year} onChange={(event) => setYear(event.target.value)}><option>Any year</option><option>2026</option><option>2025</option><option>2024</option><option>2023</option></select></div></div><div className="discover-results-heading"><div><h2>{hasSearched ? "Search results" : "Recommended for you"}</h2><p>{meta.total ? `Showing ${papers.length.toLocaleString()} of ${meta.total.toLocaleString()} results` : `${papers.length} papers found`}</p></div><span className="provider-label">Powered by OpenAlex</span></div>{(actionError || searchError) && <p className="api-action-error" role="alert">{actionError || searchError}</p>}{isLoading && <p className="search-loading" role="status">Searching the academic index…</p>}<div className="paper-results-grid">{papers.map((paper) => { const isSaved = savedPapers.some((savedPaper) => savedPaper.id === paper.id); const isSaving = savingId === paper.id; return <article className="research-paper-card" key={paper.id}><div className="paper-card-top"><span>{paper.venue}</span><span>{paper.year}</span></div><h3>{paper.title}</h3><p className="paper-authors">{paper.authors || "Authors unavailable"}</p><p className="paper-abstract">{paper.abstract}</p><div className="paper-tags">{paper.topics.map((item) => <span key={item}>{item}</span>)}</div><div className="paper-meta"><span>{paper.citations.toLocaleString()} citations</span><a href={paper.link} target="_blank" rel="noreferrer">Source <FaExternalLinkAlt /></a></div><button type="button" disabled={isSaving} className={`save-paper-button ${isSaved ? "saved" : ""}`} onClick={() => toggleSaved(paper)}>{isSaving ? "Updating…" : isSaved ? <><FaCheck /> Saved to library</> : <><FaBookmark /> Save paper</>}</button></article>; })}</div>{!isLoading && papers.length === 0 && <div className="no-search-results"><FaSearch /><h2>No papers found</h2><p>Try another topic, author, or publication year.</p></div>}{meta.hasMore && <div className="load-more"><button type="button" onClick={loadMore} disabled={isLoadingMore}>{isLoadingMore ? "Loading more papers…" : "Load more papers"}<FaArrowRight /></button></div>}</section>;
 };
 
 export default SearchPaper;

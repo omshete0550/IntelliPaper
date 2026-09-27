@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
-import { FaBars, FaBell, FaBookOpen, FaCheckDouble, FaCompass, FaFileAlt, FaHeart, FaHome, FaSearch, FaSlidersH, FaUser } from "react-icons/fa";
+import { NavLink, useNavigate } from "react-router-dom";
+import { FaBars, FaBell, FaBookOpen, FaCheckDouble, FaCompass, FaFileAlt, FaHeart, FaHome, FaSearch, FaSignOutAlt, FaSlidersH, FaUser } from "react-icons/fa";
 import "./Sidebar.css";
+import { useAuth } from "../../context/AuthContext";
 
 const navigation = [
   { to: "/dashboard/home", icon: <FaHome />, label: "Overview" },
@@ -14,11 +15,14 @@ const navigation = [
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   useEffect(() => {
     const closeOnEscape = (event) => event.key === "Escape" && setIsOpen(false);
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, []);
+  const signOut = () => { logout(); setIsOpen(false); navigate("/"); };
   return (
     <>
       {isOpen && <button className="sidebar-backdrop" onClick={() => setIsOpen(false)} aria-label="Close navigation" />}
@@ -30,7 +34,7 @@ const Sidebar = () => {
           <p className="sidebar-label sidebar-account-label">ACCOUNT</p>
           <ul><li><NavLink to="/dashboard/profile" onClick={() => setIsOpen(false)}><span className="sidebar-icon"><FaUser /></span><span>Profile</span></NavLink></li><li><NavLink to="/dashboard/user-preference-form" onClick={() => setIsOpen(false)}><span className="sidebar-icon"><FaSlidersH /></span><span>Preferences</span></NavLink></li></ul>
         </nav>
-        <div className="sidebar-user"><span className="avatar">OS</span><span><strong>Om Shete</strong><small>Researcher</small></span></div>
+        <div className="sidebar-user"><span className="avatar">{user?.name?.split(" ").map((name) => name[0]).join("").slice(0, 2).toUpperCase() || "IP"}</span><span><strong>{user?.name || "Researcher"}</strong><small>{user?.degree || "Researcher"}</small></span><button type="button" className="sidebar-signout" onClick={signOut} aria-label="Sign out" title="Sign out"><FaSignOutAlt /></button></div>
       </aside>
       <header className="dashboard-topbar">
         <button type="button" className="sidebar-toggle" onClick={() => setIsOpen(!isOpen)} aria-label={isOpen ? "Close navigation" : "Open navigation"} aria-expanded={isOpen}><FaBars /></button>

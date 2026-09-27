@@ -27,6 +27,7 @@ model User {
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
   savedPapers     SavedPaper[]
+  conferenceBookmarks ConferenceBookmark[]
 }
 
 model SavedPaper {
@@ -48,5 +49,20 @@ model SavedPaper {
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, externalId])
+  @@index([userId, savedAt])
+}
+
+model ConferenceBookmark {
+  id            String   @id @default(cuid())
+  userId        String
+  conferenceId  String
+  name          String
+  startDate     String
+  location      String   @default("")
+  link          String   @default("")
+  savedAt       DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, conferenceId])
   @@index([userId, savedAt])
 }
