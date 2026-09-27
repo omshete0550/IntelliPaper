@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const createConferenceBookmarkSchema = z.object({
+  eventId: z.string().trim().min(1).max(120).optional(),
   conferenceId: z.string().trim().min(1).max(120),
   name: z.string().trim().min(1).max(500),
   startDate: z.string().trim().min(1).max(40),

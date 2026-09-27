@@ -1,43 +1,144 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { api, authConfig } from "../../../../lib/api";
 import "./Conference.css";
 
-const allConferences = [
-  { id: "vldb-2026", name: "Proc. of the VLDB Volume 19 (for VLDB 2026)", date: "8/30/2026", location: "Boston, USA", link: "https://vldb.org/2026/" },
-  { id: "icpr-2026", name: "28th International Conference on Pattern Recognition", date: "8/17/2026", location: "Lyon, France", link: "https://icpr2026.org/" },
-  { id: "icemcsi-2026", name: "International Conference on Emerging Trends in Mobile Computing", date: "6/17/2026", location: "Bengaluru, India", link: "https://newhorizonindia.edu/icemcsi26/" },
-  { id: "sigmod-2026", name: "SIGMOD International Conference on Management of Data (2026)", date: "5/31/2026", location: "Bengaluru, India", link: "https://2026.sigmod.org/" },
-  { id: "icdais-2026", name: "International Conference on Data Analytics and Intelligent Systems", date: "4/14/2026", location: "Khenchela, Algeria", link: "https://www.icdais.org" },
-  { id: "wcst-2026", name: "World Conference on Computational Science and Technology", date: "3/26/2026", location: "Punjab, India", link: "https://www.cuchd.in/conference/WcCST-26/" },
-];
+const pageSize = 10;
 
 const ConferencePage = ({ token }) => {
   const [search, setSearch] = useState("");
   const [view, setView] = useState("all");
+  const [events, setEvents] = useState([]);
   const [myConferences, setMyConferences] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [actionId, setActionId] = useState("");
   const [error, setError] = useState("");
+  const [syncMessage, setSyncMessage] = useState("");
+  const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    api.get("/conferences", authConfig(token)).then((response) => setMyConferences(response.data.conferences.map((conference) => ({ ...conference, id: conference.conferenceId, recordId: conference.id, date: conference.startDate })))).catch(() => setError("Unable to load your saved conferences.")).finally(() => setIsLoading(false));
+  const load = useCallback(async () => {
+    try {
+      const [eventResponse, bookmarkResponse] = await Promise.all([
+        api.get("/conferences/events", authConfig(token)),
+        api.get("/conferences", authConfig(token)),
+      ]);
+      setEvents(eventResponse.data.conferences);
+      setMyConferences(bookmarkResponse.data.conferences);
+    } catch {
+      setError("Unable to load the conference catalog.");
+    } finally {
+      setIsLoading(false);
+    }
   }, [token]);
 
-  const addConference = async (conference) => {
-    setActionId(conference.id); setError("");
-    try { const response = await api.post("/conferences", { conferenceId: conference.id, name: conference.name, startDate: conference.date, location: conference.location, link: conference.link }, authConfig(token)); setMyConferences((current) => [{ ...response.data.conference, id: response.data.conference.conferenceId, recordId: response.data.conference.id, date: response.data.conference.startDate }, ...current]); }
-    catch (requestError) { setError(requestError.response?.data?.error || "Unable to save this conference."); }
-    finally { setActionId(""); }
-  };
-  const removeConference = async (conference) => {
-    setActionId(conference.id); setError("");
-    try { await api.delete(`/conferences/${conference.recordId}`, authConfig(token)); setMyConferences((current) => current.filter((item) => item.recordId !== conference.recordId)); }
-    catch (requestError) { setError(requestError.response?.data?.error || "Unable to remove this conference."); }
-    finally { setActionId(""); }
-  };
-  const conferences = useMemo(() => (view === "all" ? allConferences : myConferences).filter((conference) => `${conference.name} ${conference.location}`.toLowerCase().includes(search.toLowerCase())), [view, myConferences, search]);
+  useEffect(() => { load(); }, [load]);
+  useEffect(() => { setPage(1); }, [search, view]);
 
-  return <section className="conference-container"><header className="conference-page-heading"><div><p className="eyebrow">ACADEMIC EVENTS</p><h1>Conferences</h1><p>Save events you want to follow and return to them from any device.</p></div></header><div className="conference-header"><div className="btn-cont"><button type="button" className={view === "all" ? "active" : ""} onClick={() => setView("all")}>All Conferences</button><button type="button" className={view === "my" ? "active" : ""} onClick={() => setView("my")}>My Conferences ({myConferences.length})</button></div><input type="search" className="search-box" placeholder="Filter conferences…" value={search} onChange={(event) => setSearch(event.target.value)} /></div>{error && <p className="conference-status conference-error" role="alert">{error}</p>}<table className="conference-table"><thead><tr><th>Name</th><th>Start date</th><th>Location</th><th>Website</th><th>Action</th></tr></thead><tbody>{conferences.length ? conferences.map((conference) => { const isSaved = myConferences.some((item) => item.id === conference.id); const isWorking = actionId === conference.id; return <tr key={conference.recordId || conference.id}><td>{conference.name}</td><td>{conference.date}</td><td>{conference.location || "—"}</td><td>{conference.link ? <a href={conference.link} target="_blank" rel="noopener noreferrer">Visit site</a> : "—"}</td><td>{view === "all" ? <button type="button" disabled={isSaved || isWorking} onClick={() => addConference(conference)} className="add-btn">{isWorking ? "Saving…" : isSaved ? "Saved" : "Save"}</button> : <button type="button" disabled={isWorking} onClick={() => removeConference(conference)} className="remove-conference-btn">{isWorking ? "Removing…" : "Remove"}</button>}</td></tr>; }) : <tr><td colSpan="5" className="no-data">{view === "my" ? "No saved conferences yet. Save an event from All Conferences to find it here." : "No conferences found."}</td></tr>}</tbody></table>{isLoading && <p className="conference-status" role="status">Loading your saved conferences…</p>}</section>;
+  const syncLiveEvents = async () => {
+    setIsSyncing(true);
+    setError("");
+    try {
+      const response = await api.post("/conferences/sync", {}, authConfig(token));
+      setEvents(response.data.conferences);
+      setSyncMessage(response.data.sync?.openReview?.message || "Conference sources refreshed.");
+      setPage(1);
+    } catch {
+      setError("Unable to refresh live conference events.");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const addConference = async (event) => {
+    setActionId(event.id);
+    try {
+      const response = await api.post("/conferences", {
+        eventId: event.id,
+        conferenceId: event.externalId,
+        name: event.name,
+        startDate: event.startDate || "To be announced",
+        location: event.location,
+        link: event.websiteUrl,
+      }, authConfig(token));
+      setMyConferences((current) => [response.data.conference, ...current]);
+    } catch (requestError) {
+      setError(requestError.response?.data?.error || "Unable to save this conference.");
+    } finally {
+      setActionId("");
+    }
+  };
+
+  const removeConference = async (conference) => {
+    setActionId(conference.id);
+    try {
+      await api.delete(`/conferences/${conference.id}`, authConfig(token));
+      setMyConferences((current) => current.filter((item) => item.id !== conference.id));
+    } catch {
+      setError("Unable to remove this conference.");
+    } finally {
+      setActionId("");
+    }
+  };
+
+  const conferences = useMemo(() => (view === "all" ? events : myConferences)
+    .filter((conference) => `${conference.name} ${conference.location} ${(conference.topics || []).join(" ")}`.toLowerCase().includes(search.toLowerCase())), [view, events, myConferences, search]);
+  const totalPages = Math.max(1, Math.ceil(conferences.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const pageStart = (currentPage - 1) * pageSize;
+  const paginatedConferences = conferences.slice(pageStart, pageStart + pageSize);
+  const firstVisible = conferences.length ? pageStart + 1 : 0;
+  const lastVisible = Math.min(pageStart + pageSize, conferences.length);
+
+  return <section className="conference-container">
+    <header className="conference-page-heading">
+      <div>
+        <p className="eyebrow">ACADEMIC EVENTS</p>
+        <h1>Conferences</h1>
+        <p>Live OpenReview venues and verified catalog events, ranked using your research interests. Confirm deadlines and event details on the source page before submitting.</p>
+      </div>
+    </header>
+
+    <div className="conference-header">
+      <div className="btn-cont">
+        <button type="button" className={view === "all" ? "active" : ""} onClick={() => setView("all")}>Recommended events</button>
+        <button type="button" className={view === "my" ? "active" : ""} onClick={() => setView("my")}>My Conferences ({myConferences.length})</button>
+        <button type="button" className="sync-conferences-btn" disabled={isSyncing} onClick={syncLiveEvents}>{isSyncing ? "Refreshing..." : "Refresh live events"}</button>
+      </div>
+      <input type="search" className="search-box" placeholder="Filter conferences..." value={search} onChange={(event) => setSearch(event.target.value)} aria-label="Filter conferences" />
+    </div>
+
+    {error && <p className="conference-status conference-error" role="alert">{error}</p>}
+    {syncMessage && <p className="conference-status conference-success" role="status">{syncMessage}</p>}
+
+    <table className="conference-table">
+      <thead><tr><th>Conference</th><th>Deadline</th><th>Event date</th><th>Location</th><th>Action</th></tr></thead>
+      <tbody>{paginatedConferences.length ? paginatedConferences.map((conference) => {
+        const saved = myConferences.find((item) => item.eventId === conference.id || item.conferenceId === conference.externalId);
+        const working = actionId === (saved?.id || conference.id);
+        return <tr key={conference.id}>
+          <td><strong>{conference.acronym || conference.name}</strong><small>{(conference.topics || []).join(" / ")}</small><small className="conference-source">{conference.sourceUrl ? <a href={conference.sourceUrl} target="_blank" rel="noreferrer">{conference.provider || "View source"}</a> : conference.provider}</small></td>
+          <td>{conference.submissionDeadline || "To be announced"}</td>
+          <td>{conference.startDate || "To be announced"}</td>
+          <td>{conference.location || "To be announced"}</td>
+          <td>{view === "all"
+            ? <button type="button" disabled={Boolean(saved) || working} onClick={() => addConference(conference)} className="add-btn">{working ? "Saving..." : saved ? "Saved" : "Save"}</button>
+            : <button type="button" disabled={working} onClick={() => removeConference(conference)} className="remove-conference-btn">{working ? "Removing..." : "Remove"}</button>}
+          </td>
+        </tr>;
+      }) : <tr><td colSpan="5" className="no-data">{view === "my" ? "No saved conferences yet." : "No conference events match your search."}</td></tr>}</tbody>
+    </table>
+
+    {conferences.length > 0 && <nav className="conference-pagination" aria-label="Conference pagination">
+      <p>Showing {firstVisible}–{lastVisible} of {conferences.length} conferences</p>
+      <div>
+        <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={currentPage === 1}>Previous</button>
+        <span aria-current="page">Page {currentPage} of {totalPages}</span>
+        <button type="button" onClick={() => setPage((current) => Math.min(totalPages, current + 1))} disabled={currentPage === totalPages}>Next</button>
+      </div>
+    </nav>}
+
+    {isLoading && <p className="conference-status" role="status">Loading conference events...</p>}
+  </section>;
 };
 
 export default ConferencePage;

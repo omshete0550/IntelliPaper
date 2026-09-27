@@ -1,0 +1,3 @@
+Data analysis transforms raw observations into information that can support a decision. The process often includes collecting data, cleaning missing or inconsistent values, exploring patterns, and communicating findings with appropriate visualizations.
+
+A reliable evaluation separates training data from test data. This makes it possible to measure whether a model generalizes to examples that were not used while its parameters were being learned.

@@ -28,6 +28,7 @@ model User {
   updatedAt       DateTime     @updatedAt
   savedPapers     SavedPaper[]
   conferenceBookmarks ConferenceBookmark[]
+  similarityReports SimilarityReport[]
 }
 
 model SavedPaper {
@@ -60,9 +61,90 @@ model ConferenceBookmark {
   startDate     String
   location      String   @default("")
   link          String   @default("")
+  eventId       String?
   savedAt       DateTime @default(now())
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event         ConferenceEvent? @relation(fields: [eventId], references: [id], onDelete: SetNull)
 
   @@unique([userId, conferenceId])
   @@index([userId, savedAt])
+}
+
+model ConferenceEvent {
+  id                  String               @id @default(cuid())
+  provider            String               @default("Verified catalog")
+  externalId          String               @unique
+  name                String
+  acronym             String               @default("")
+  topics              String[]             @default([])
+  submissionDeadline  String               @default("")
+  startDate           String               @default("")
+  endDate             String               @default("")
+  location            String               @default("")
+  mode                String               @default("To be announced")
+  websiteUrl          String               @default("")
+  sourceUrl           String               @default("")
+  verificationStatus  String               @default("verified")
+  verifiedAt          DateTime             @default(now())
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  bookmarks           ConferenceBookmark[]
+
+  @@index([verifiedAt])
+}
+
+model ReferenceDocument {
+  id          String   @id @default(cuid())
+  provider    String   @default("OpenAlex")
+  externalId  String   @unique
+  title       String
+  sourceUrl   String
+  license     String   @default("")
+  content     String   @db.Text
+  fetchedAt   DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SimilarityReport {
+  id                        String            @id @default(cuid())
+  userId                    String
+  inputText                 String            @db.Text
+  engine                    String
+  highestSimilarity         Int
+  localCorpusParagraphs     Int
+  openAlexCorpusParagraphs  Int
+  semanticEnabled           Boolean           @default(false)
+  semanticMessage           String            @default("")
+  referenceStatus           String            @default("")
+  referenceMessage          String            @default("")
+  lexicalThreshold          Float             @default(0.18)
+  semanticThreshold         Float             @default(0.70)
+  ignoreReferences          Boolean           @default(true)
+  createdAt                 DateTime          @default(now())
+  user                      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  matches                   SimilarityMatch[]
+
+  @@index([userId, createdAt])
+}
+
+model SimilarityMatch {
+  id                    String           @id @default(cuid())
+  reportId              String
+  sourceName            String
+  sourceParagraph       Int
+  sourceUrl             String           @default("")
+  sourceLicense         String           @default("")
+  sourceProvider        String
+  submittedText         String           @db.Text
+  referenceText         String           @db.Text
+  lexicalScore          Float
+  semanticScore         Float?
+  similarityPercentage  Int
+  confidence            String
+  matchBasis            String
+  excluded              Boolean          @default(false)
+  report                SimilarityReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId, excluded])
 }

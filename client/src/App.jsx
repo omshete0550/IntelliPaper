@@ -59,7 +59,7 @@ function App() {
       <Route path="user-preference-form" element={<UserPreferencesForm initialPreferences={user} onSave={savePreferences} />} />
       <Route path="search-paper" element={<SearchPaper savedPapers={savedPapers} onSavePaper={savePaper} onRemovePaper={removePaper} />} />
       <Route path="plagiarism-checker" element={<PlagiarismChecker />} />
-      <Route path="publishing-guide" element={<PublishingGuide />} />
+      <Route path="publishing-guide" element={<PublishingGuide interests={user?.interests || []} />} />
       <Route path="conferences" element={<ConferencePage token={token} />} />
       <Route path="saved-paper" element={<SavedPaper savedPapers={savedPapers} onUpdatePaper={updatePaper} onRemovePaper={removePaper} />} />
       <Route path="profile" element={<Profile preferences={user} savedPapers={savedPapers} />} />

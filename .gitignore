@@ -3,5 +3,7 @@ client/node_modules/
 client/dist/
 server/node_modules/
 server/.env
+.env
+ml-service/.venv/
 *.log
 .DS_Store
