@@ -19,6 +19,9 @@ services:
     restart: unless-stopped
     environment:
       CORPUS_DIRECTORY: /app/data/corpus
+      SIMILARITY_REQUIRE_TOKEN: "true"
+      SIMILARITY_SERVICE_TOKEN: ${SIMILARITY_SERVICE_TOKEN:-local-development-token}
+      SEMANTIC_ENABLED: ${SEMANTIC_ENABLED:-true}
     volumes:
       - ./ml-service/data/corpus:/app/data/corpus:ro
     expose:
@@ -37,6 +40,7 @@ services:
       OPENALEX_EMAIL: ${OPENALEX_EMAIL:-}
       OPENALEX_API_KEY: ${OPENALEX_API_KEY:-}
       SIMILARITY_SERVICE_URL: http://ml-service:8000
+      SIMILARITY_SERVICE_TOKEN: ${SIMILARITY_SERVICE_TOKEN:-local-development-token}
     depends_on:
       database:
         condition: service_healthy

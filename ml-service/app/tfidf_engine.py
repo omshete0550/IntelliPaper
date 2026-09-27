@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import os
 from pathlib import Path
 from xml.etree import ElementTree
 
@@ -12,6 +13,10 @@ from .embedding_engine import MODEL_NAME, SemanticEngineError, semantic_similari
 MATCH_THRESHOLD = 0.18
 SEMANTIC_MATCH_THRESHOLD = 0.70
 MAX_MATCHES = 5
+
+
+def semantic_enabled() -> bool:
+    return os.getenv("SEMANTIC_ENABLED", "true").lower() in {"1", "true", "yes"}
 
 
 @dataclass
@@ -114,12 +119,14 @@ def analyse(text: str, corpus_directory: Path, references: list = None, quality=
     scores = cosine_similarity(submitted_vectors, corpus_vectors)
 
     semantic_scores = None
-    semantic_message = "Semantic model is unavailable; lexical TF-IDF matching was used."
-    try:
-        semantic_scores = semantic_similarity_matrix(submitted_paragraphs, [item.text for item in corpus])
-        semantic_message = f"Semantic embeddings enabled with {MODEL_NAME}."
-    except SemanticEngineError:
-        pass
+    semantic_message = "Semantic embeddings are disabled; lexical TF-IDF matching was used."
+    if semantic_enabled():
+        semantic_message = "Semantic model is unavailable; lexical TF-IDF matching was used."
+        try:
+            semantic_scores = semantic_similarity_matrix(submitted_paragraphs, [item.text for item in corpus])
+            semantic_message = f"Semantic embeddings enabled with {MODEL_NAME}."
+        except SemanticEngineError:
+            pass
 
     candidates = []
     for submitted_index, row in enumerate(scores):

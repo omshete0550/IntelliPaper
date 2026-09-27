@@ -2,6 +2,18 @@
 
 This service compares pasted text with local `.txt` reference paragraphs and any permitted OpenAlex full-text candidates sent by the Node API. It uses TF-IDF lexical similarity plus a Sentence Transformer semantic-embedding signal, and is a similarity preview, not a plagiarism verdict.
 
+## Deployment security
+
+When this is deployed as a public Render Web Service, set these environment variables:
+
+```text
+SIMILARITY_REQUIRE_TOKEN=true
+SIMILARITY_SERVICE_TOKEN=<a-long-random-secret>
+SEMANTIC_ENABLED=false
+```
+
+Set the same `SIMILARITY_SERVICE_TOKEN` on the Node API. The API sends it in the `X-IntelliPaper-Service-Token` header, and `/analyze` rejects requests without it. Keep `SEMANTIC_ENABLED=false` on Render's 512 MB free instance; this uses the reliable TF-IDF baseline without loading the much larger embedding model.
+
 ## Run locally
 
 ```powershell

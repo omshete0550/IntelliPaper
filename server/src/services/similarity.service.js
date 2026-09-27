@@ -4,9 +4,14 @@ const serviceUrl = () => (process.env.SIMILARITY_SERVICE_URL || "http://localhos
 
 export const checkSimilarity = async (text, references = [], controls = {}) => {
   try {
+    const headers = { "Content-Type": "application/json" };
+    if (process.env.SIMILARITY_SERVICE_TOKEN) {
+      headers["X-IntelliPaper-Service-Token"] = process.env.SIMILARITY_SERVICE_TOKEN;
+    }
+
     const response = await fetch(`${serviceUrl()}/analyze`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify({ text, references, quality: { lexical_threshold: controls.lexicalThreshold, semantic_threshold: controls.semanticThreshold, ignore_references: controls.ignoreReferences } }),
       signal: AbortSignal.timeout(30_000),
     });
