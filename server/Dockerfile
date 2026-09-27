@@ -15,4 +15,6 @@ COPY src ./src
 
 ENV NODE_ENV=production
 EXPOSE 5000
-CMD ["node", "index.js"]
+# Render's Docker Command field is passed as container arguments, so keep the
+# migration-and-start sequence in the image where the shell can run it safely.
+CMD ["sh", "-c", "npx prisma db push --skip-generate && exec node index.js"]
